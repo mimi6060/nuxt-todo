@@ -35,6 +35,9 @@
     "deadline": "Date d'échéance",
     "tags": "Tags",
     "tagSelect": "Sélectionner des tags...",
+    "info": "Informations",
+    "createdAt": "Créé le",
+    "updatedAt": "Modifié le",
     "tagsPlaceholder": "Ajouter ou rechercher un tag...",
     "tagsAvailable": "{count} tag(s) disponible(s)",
     "tagCreate": "Créer \"{name}\"",
@@ -194,6 +197,18 @@
     "hide": "Masquer",
     "passwordHint": "8 caractères minimum, avec majuscule, minuscule et chiffre"
   },
+  "user": {
+    "editProfile": "Mon profil",
+    "profileUpdated": "Profil mis à jour avec succès",
+    "emailCannotChange": "L'email ne peut pas être modifié",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "currentPasswordPlaceholder": "Votre mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Votre nouveau mot de passe",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "passwordChanged": "Mot de passe modifié avec succès"
+  },
   "apiErrors": {
     "CATEGORY_NAME_REQUIRED": "Le nom de la catégorie est requis",
     "COLOR_REQUIRED": "La couleur est requise",
@@ -223,6 +238,12 @@
     "PASSWORD_NEEDS_NUMBER": "Le mot de passe doit contenir un chiffre",
     "INVALID_EMAIL_FORMAT": "Format d'email invalide",
     "PASSWORDS_DO_NOT_MATCH": "Les mots de passe ne correspondent pas",
-    "RATE_LIMITED": "Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer."
+    "RATE_LIMITED": "Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.",
+    "NAME_TOO_LONG": "Le nom est trop long (100 caractères max)",
+    "PROFILE_UPDATE_ERROR": "Erreur lors de la mise à jour du profil",
+    "CURRENT_PASSWORD_REQUIRED": "Le mot de passe actuel est requis",
+    "NEW_PASSWORD_REQUIRED": "Le nouveau mot de passe est requis",
+    "CURRENT_PASSWORD_INCORRECT": "Le mot de passe actuel est incorrect",
+    "PASSWORD_CHANGE_ERROR": "Erreur lors du changement de mot de passe"
   }
 }

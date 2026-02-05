@@ -30,6 +30,7 @@ const emit = defineEmits<{
   toggle: [id: string]
   edit: [todo: Todo]
   delete: [id: string]
+  view: [todo: Todo]
 }>()
 
 // Reference au conteneur scrollable
@@ -67,6 +68,10 @@ function handleDelete(id: string) {
   emit('delete', id)
 }
 
+function handleView(todo: Todo) {
+  emit('view', todo)
+}
+
 // Le virtualizer se met a jour automatiquement quand itemCount change
 // grace a l'utilisation de computed() dans useVirtualizer
 </script>
@@ -96,6 +101,7 @@ function handleDelete(id: string) {
             @toggle="handleToggle"
             @edit="handleEdit"
             @delete="handleDelete"
+            @view="handleView"
           />
         </div>
       </div>

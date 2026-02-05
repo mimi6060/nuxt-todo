@@ -15,6 +15,12 @@ import type { Todo, CreateTodoDTO, UpdateTodoDTO, TodoStats, Priority } from '~/
 import type { ApiResponse, PaginationMeta } from '~/types/api'
 import { PRIORITY_KEYS } from '~/constants/priorities'
 
+// Type pour les erreurs de fetch
+interface FetchError {
+  data?: { data?: { code?: string } }
+  message?: string
+}
+
 export const useTodoStore = defineStore('todos', {
   /**
    * STATE : Données réactives du store
@@ -209,7 +215,7 @@ export const useTodoStore = defineStore('todos', {
           this.error = response.error || 'Failed to fetch todos'
           return null
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         // Only set error if this is still the latest request
         if (requestId === this._currentFetchRequestId) {
           const { isAuthError, handleAuthError } = useAuth()
@@ -218,7 +224,8 @@ export const useTodoStore = defineStore('todos', {
             handleAuthError()
             return null
           }
-          this.error = err.data?.data?.code || err.message || 'Failed to fetch todos'
+          const fetchErr = err as FetchError
+          this.error = fetchErr.data?.data?.code || fetchErr.message || 'Failed to fetch todos'
           console.error('Error fetching todos:', err)
         }
         return null
@@ -263,13 +270,14 @@ export const useTodoStore = defineStore('todos', {
           this.error = response.error || 'Failed to create todo'
           return null
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         const { isAuthError, handleAuthError } = useAuth()
         if (isAuthError(err)) {
           handleAuthError()
           return null
         }
-        this.error = err.data?.data?.code || err.message || 'Failed to create todo'
+        const fetchErr = err as FetchError
+        this.error = fetchErr.data?.data?.code || fetchErr.message || 'Failed to create todo'
         console.error('Error creating todo:', err)
         return null
       } finally {
@@ -315,13 +323,14 @@ export const useTodoStore = defineStore('todos', {
             this.error = response.error || 'Failed to update todo'
             return null
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           const { isAuthError, handleAuthError } = useAuth()
           if (isAuthError(err)) {
             handleAuthError()
             return null
           }
-          this.error = err.data?.data?.code || err.message || 'Failed to update todo'
+          const fetchErr = err as FetchError
+          this.error = fetchErr.data?.data?.code || fetchErr.message || 'Failed to update todo'
           console.error('Error updating todo:', err)
           return null
         } finally {
@@ -362,13 +371,14 @@ export const useTodoStore = defineStore('todos', {
 
           this.todos = this.todos.filter(t => t.id !== id)
           return true
-        } catch (err: any) {
+        } catch (err: unknown) {
           const { isAuthError, handleAuthError } = useAuth()
           if (isAuthError(err)) {
             handleAuthError()
             return false
           }
-          this.error = err.data?.data?.code || err.message || 'Failed to delete todo'
+          const fetchErr = err as FetchError
+          this.error = fetchErr.data?.data?.code || fetchErr.message || 'Failed to delete todo'
           console.error('Error deleting todo:', err)
           return false
         } finally {

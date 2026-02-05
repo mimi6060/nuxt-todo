@@ -327,6 +327,20 @@ function getAuthHeaders(): Record<string, string> {
   return { Authorization: `Bearer ${accessToken.value}` }
 }
 
+/**
+ * Update user profile locally (after API update)
+ */
+function updateUserProfile(updates: Partial<AuthUser>) {
+  if (!user.value) return
+
+  user.value = { ...user.value, ...updates }
+
+  // Update localStorage
+  if (import.meta.client) {
+    localStorage.setItem('auth_user', JSON.stringify(user.value))
+  }
+}
+
 // ============================================
 // COMPOSABLE
 // ============================================
@@ -355,6 +369,9 @@ export function useAuth() {
     // Error handling
     handleAuthError,
     isAuthError,
+
+    // Profile
+    updateUserProfile,
 
     // Utils
     clearError: () => { error.value = null }

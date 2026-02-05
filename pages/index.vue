@@ -17,7 +17,14 @@ definePageMeta({
   middleware: 'auth'
 })
 
-import type { Todo, CreateTodoDTO, Category, Tag } from '~/types/todo'
+import type { Todo, CreateTodoDTO, Category, Tag, CategoryWithCount } from '~/types/todo'
+import type { ApiResponse, PaginationMeta } from '~/types/api'
+
+// Types pour les réponses API
+interface TodosApiResponse {
+  data: Todo[]
+  meta: PaginationMeta
+}
 
 // Lazy loading du formulaire Todo - chargé uniquement quand nécessaire
 const LazyTodoForm = defineAsyncComponent({
@@ -59,6 +66,10 @@ const editingCategory = ref<Category | undefined>(undefined)
 const showTagForm = ref(false)
 const editingTag = ref<Tag | undefined>(undefined)
 
+// Etat du modal de détail Todo
+const showTodoDetail = ref(false)
+const viewingTodo = ref<Todo | null>(null)
+
 // Development mode check
 const isDev = import.meta.dev
 
@@ -69,7 +80,7 @@ const useVirtualScrolling = computed(() => todoStore.todos.length > VIRTUAL_SCRO
 onMounted(async () => {
   try {
     // Charger les todos
-    const todosResponse = await $fetch<any>('/api/todos', {
+    const todosResponse = await $fetch<ApiResponse<TodosApiResponse>>('/api/todos', {
       headers: getAuthHeaders()
     })
     if (todosResponse.data?.data) {
@@ -80,7 +91,7 @@ onMounted(async () => {
     }
 
     // Charger les catégories
-    const categoriesResponse = await $fetch<any>('/api/categories', {
+    const categoriesResponse = await $fetch<ApiResponse<CategoryWithCount[]>>('/api/categories', {
       headers: getAuthHeaders()
     })
     if (categoriesResponse.data) {
@@ -89,7 +100,7 @@ onMounted(async () => {
 
     // Charger les tags
     await fetchTags()
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (isAuthError(error)) {
       handleAuthError()
       return
@@ -110,6 +121,21 @@ async function handleEditTodo(todo: Todo) {
 
 async function handleDeleteTodo(id: string) {
   await todoStore.deleteTodo(id)
+}
+
+function handleViewTodo(todo: Todo) {
+  viewingTodo.value = todo
+  showTodoDetail.value = true
+}
+
+function closeTodoDetail() {
+  showTodoDetail.value = false
+  viewingTodo.value = null
+}
+
+function handleEditFromDetail(todo: Todo) {
+  closeTodoDetail()
+  handleEditTodo(todo)
 }
 
 // Gestion du formulaire Todo
@@ -206,7 +232,7 @@ async function handleSubmitTag(data: { name: string; color: string | null }) {
     }
     await fetchTags()
     closeTagForm()
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (isAuthError(error)) {
       handleAuthError()
       return
@@ -223,7 +249,7 @@ async function handleDeleteTag(id: string) {
     })
     await fetchTags()
     closeTagForm()
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (isAuthError(error)) {
       handleAuthError()
       return
@@ -373,6 +399,7 @@ async function handleResetFilters() {
               @toggle="handleToggleTodo"
               @edit="handleEditTodo"
               @delete="handleDeleteTodo"
+              @view="handleViewTodo"
             />
 
             <!-- Liste des todos avec animations (petites listes <= 20 items) -->
@@ -395,6 +422,7 @@ async function handleResetFilters() {
                 @toggle="handleToggleTodo"
                 @edit="handleEditTodo"
                 @delete="handleDeleteTodo"
+                @view="handleViewTodo"
               />
             </TransitionGroup>
 
@@ -409,6 +437,14 @@ async function handleResetFilters() {
               @page-change="handlePageChange"
             />
           </div>
+
+          <!-- Modal de détail Todo -->
+          <TodoDetailModal
+            :open="showTodoDetail"
+            :todo="viewingTodo"
+            @close="closeTodoDetail"
+            @edit="handleEditFromDetail"
+          />
 
           <!-- Debug Info (development only) -->
           <div v-if="isDev" class="bg-gray-100 rounded-lg p-4 text-sm">

@@ -26,7 +26,7 @@ const emit = defineEmits<{
 // Lazy loading du formulaire Tag
 const LazyTagForm = defineAsyncComponent({
   loader: () => import('~/components/tag/TagForm.vue'),
-  delay: 200,
+  delay: 0, // Afficher immédiatement le skeleton loader
   timeout: 10000,
 })
 </script>

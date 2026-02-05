@@ -24,6 +24,7 @@ const emit = defineEmits<{
   toggle: [id: string]
   edit: [todo: Todo]
   delete: [id: string]
+  view: [todo: Todo]
 }>()
 
 // Lazy loading du modal de confirmation - chargé uniquement quand nécessaire
@@ -79,80 +80,86 @@ async function handleDelete() {
         class="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
       />
 
-      <!-- Contenu principal -->
+      <!-- Contenu principal (cliquable pour voir les détails) -->
       <div class="flex-1 min-w-0">
-        <!-- Titre et priorité -->
-        <div class="flex items-start justify-between gap-2 mb-2">
-          <h3
-            class="text-lg font-medium text-gray-900"
-            :class="{ 'line-through text-gray-500': todo.completed }"
-          >
-            {{ todo.title }}
-          </h3>
-          <span
-            :class="PRIORITY_BADGE_COLORS[todo.priority]"
-            class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap"
-          >
-            {{ t(`priority.${todo.priority}`) }}
-          </span>
-        </div>
-
-        <!-- Description -->
-        <p
-          v-if="todo.description"
-          class="text-sm text-gray-600 mb-2"
-          :class="{ 'line-through': todo.completed }"
+        <!-- Zone cliquable pour afficher les détails -->
+        <div
+          class="cursor-pointer hover:bg-gray-50 -mx-2 px-2 py-1 rounded-lg transition-colors"
+          @click="emit('view', todo)"
         >
-          {{ todo.description }}
-        </p>
-
-        <!-- Métadonnées -->
-        <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-3">
-          <!-- Catégories -->
-          <div v-if="todo.categories?.length" class="flex items-center gap-2 flex-wrap">
-            <div
-              v-for="category in todo.categories"
-              :key="category.id"
-              class="flex items-center gap-1"
+          <!-- Titre et priorité -->
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h3
+              class="text-lg font-medium text-gray-900"
+              :class="{ 'line-through text-gray-500': todo.completed }"
             >
-              <component
-                v-if="category.icon && getIconComponent(category.icon)"
-                :is="getIconComponent(category.icon)"
-                class="w-4 h-4"
-                aria-hidden="true"
-              />
-              <span>{{ category.name }}</span>
+              {{ todo.title }}
+            </h3>
+            <span
+              :class="PRIORITY_BADGE_COLORS[todo.priority]"
+              class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap"
+            >
+              {{ t(`priority.${todo.priority}`) }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <p
+            v-if="todo.description"
+            class="text-sm text-gray-600 mb-2"
+            :class="{ 'line-through': todo.completed }"
+          >
+            {{ todo.description }}
+          </p>
+
+          <!-- Métadonnées -->
+          <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-3">
+            <!-- Catégories -->
+            <div v-if="todo.categories?.length" class="flex items-center gap-2 flex-wrap">
+              <div
+                v-for="category in todo.categories"
+                :key="category.id"
+                class="flex items-center gap-1"
+              >
+                <component
+                  v-if="category.icon && getIconComponent(category.icon)"
+                  :is="getIconComponent(category.icon)"
+                  class="w-4 h-4"
+                  aria-hidden="true"
+                />
+                <span>{{ category.name }}</span>
+              </div>
+            </div>
+
+            <!-- Deadline -->
+            <div
+              v-if="deadlineFormatted"
+              class="flex items-center gap-1"
+              :class="{ 'text-red-600 font-medium': isOverdue }"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span>{{ deadlineFormatted }}</span>
+              <span v-if="isOverdue" class="text-xs font-bold">({{ t('todo.overdue') }})</span>
             </div>
           </div>
 
-          <!-- Deadline -->
-          <div
-            v-if="deadlineFormatted"
-            class="flex items-center gap-1"
-            :class="{ 'text-red-600 font-medium': isOverdue }"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span>{{ deadlineFormatted }}</span>
-            <span v-if="isOverdue" class="text-xs font-bold">({{ t('todo.overdue') }})</span>
+          <!-- Tags -->
+          <div v-if="todo.tags.length" class="flex flex-wrap gap-2 mb-3">
+            <span
+              v-for="tag in todo.tags"
+              :key="tag.id"
+              class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+            >
+              #{{ tag.name }}
+            </span>
           </div>
-        </div>
-
-        <!-- Tags -->
-        <div v-if="todo.tags.length" class="flex flex-wrap gap-2 mb-3">
-          <span
-            v-for="tag in todo.tags"
-            :key="tag.id"
-            class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-          >
-            #{{ tag.name }}
-          </span>
         </div>
 
         <!-- Actions -->

@@ -28,7 +28,10 @@ Application todo list complète et éducative construite avec Nuxt 3.
 # Installer les dépendances
 npm install
 
-# Démarrer le serveur de développement
+# Démarrer avec Docker (PostgreSQL + App)
+docker-compose up --build -d
+
+# Ou démarrer le serveur de développement (nécessite PostgreSQL)
 npm run dev
 
 # Build pour production
@@ -37,6 +40,16 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+## Compte de démonstration
+
+Après avoir lancé l'application avec `docker-compose up`, un compte de démonstration est créé automatiquement :
+
+| Email | Mot de passe |
+|-------|--------------|
+| `demo@example.com` | `Demo1234!` |
+
+> **Note**: Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.
 
 ## Structure du Projet
 
