@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// AUTHENTICATION
+// ============================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String   // Hashed with bcrypt
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastLoginAt  DateTime?
+
+  // Relations
+  todos        Todo[]
+  categories   Category[]
+  tags         Tag[]
+  refreshTokens RefreshToken[]
+
+  @@index([email])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])              // For cleanup of expired tokens
+  @@index([userId, revokedAt])      // For finding active tokens per user
+}
+
+// ============================================
+// DOMAIN MODELS
+// ============================================
+
+// Modele Todo principal
+model Todo {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(200)
+  description String?  @db.VarChar(2000)
+  completed   Boolean  @default(false)
+  priority    Priority @default(MEDIUM)
+  deadline    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  categories  Category[]  // Many-to-many with Category
+  tags        Tag[]       // Many-to-many with Tag
+
+  @@index([userId])
+  @@index([completed])
+  @@index([priority])
+  @@index([deadline])
+  @@index([createdAt])                      // For sorting by creation date
+  @@index([userId, completed])
+  @@index([userId, priority])               // For filtering user's todos by priority
+  @@index([userId, deadline])               // For filtering user's todos by deadline (upcoming tasks)
+  @@index([userId, createdAt])              // For listing user's todos sorted by creation date
+  @@index([userId, completed, priority])    // For filtered lists by status and priority
+  @@index([userId, completed, deadline])
+}
+
+// Modele Tag (many-to-many avec Todo)
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(50)
+  color     String?  @db.VarChar(20)  // Optional color for tag
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  todos     Todo[]   // Many-to-many with Tag
+
+  @@unique([userId, name]) // Unique tag name per user
+  @@index([userId])
+  @@index([name])
+}
+
+// Modele Category (many-to-many avec Todo)
+model Category {
+  id    String  @id @default(cuid())
+  name  String  @db.VarChar(100)
+  color String  @db.VarChar(20)
+  icon  String? @db.VarChar(50)
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  todos  Todo[] // Many-to-many with Todo
+
+  @@unique([userId, name]) // Unique name per user
+  @@index([userId])
+  @@index([name])
+}
+
+// Enum pour les priorites
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}

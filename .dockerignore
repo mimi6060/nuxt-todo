@@ -1,0 +1,41 @@
+# Dépendances
+node_modules
+npm-debug.log
+
+# Nuxt build
+.nuxt
+.output
+dist
+.cache
+
+# Fichiers générés
+generated
+
+# Git
+.git
+.gitignore
+
+# Environnement
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Divers
+README.md
+.claude

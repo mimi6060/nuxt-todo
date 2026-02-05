@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Service PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: nuxt-todo-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nuxt_todo
+    volumes:
+      # Persistance des données (survit au redémarrage)
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service Nuxt (app)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nuxt-todo-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Connection à la DB via le nom du service 'postgres'
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/nuxt_todo?schema=public
+      NODE_ENV: development
+      # JWT Secret pour l'authentification (CHANGE EN PRODUCTION!)
+      JWT_SECRET: your-super-secret-key-change-in-production-56b0349a19eb91d76fd44b67c4066acc9db682f18206a4e2130ab4a8b038ffc2
+      # Mettre à "true" pour seed automatique au premier lancement
+      SEED_DB: "true"
+    volumes:
+      # Hot reload : synchronise le code local avec le conteneur
+      - .:/app
+      - /app/node_modules
+      - /app/.nuxt
+      - /app/generated
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+
+# Volumes nommés pour persistance
+volumes:
+  postgres_data:
+    driver: local

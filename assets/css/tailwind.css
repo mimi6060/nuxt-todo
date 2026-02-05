@@ -1,0 +1,172 @@
+/**
+ * Fichier CSS principal avec Tailwind
+ */
+
+/* Directives Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Styles personnalisés */
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  /* ========================================
+   * BOUTONS
+   * ======================================== */
+  .btn {
+    @apply px-4 py-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-warning {
+    @apply btn bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500;
+  }
+
+  .btn-danger-outline {
+    @apply btn bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-gray-100 text-gray-700;
+  }
+
+  /* ========================================
+   * FORMULAIRES
+   * ======================================== */
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  .form-select {
+    @apply form-input;
+  }
+
+  .form-textarea {
+    @apply form-input resize-y;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  .form-error {
+    @apply mt-1 text-sm text-red-600;
+  }
+
+  .form-hint {
+    @apply mt-1 text-xs text-gray-500;
+  }
+
+  /* ========================================
+   * CARTES
+   * ======================================== */
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+
+  .card-sm {
+    @apply bg-white rounded-lg shadow-md p-4;
+  }
+
+  .card-bordered {
+    @apply bg-white rounded-lg border border-gray-200 p-4;
+  }
+
+  /* ========================================
+   * TAGS
+   * ======================================== */
+  .tag {
+    @apply inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm;
+  }
+
+  .tag-removable {
+    @apply tag pr-2;
+  }
+
+  .tag-remove-btn {
+    @apply ml-1 hover:text-blue-900 focus:outline-none;
+  }
+
+  /* ========================================
+   * LIENS D'ACTION
+   * ======================================== */
+  .action-link {
+    @apply inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-md transition-colors;
+  }
+
+  .action-link-primary {
+    @apply action-link text-blue-600 hover:bg-blue-50;
+  }
+
+  .action-link-danger {
+    @apply action-link text-red-600 hover:bg-red-50;
+  }
+
+  /* ========================================
+   * TRANSITIONS
+   * ======================================== */
+  .list-enter-active,
+  .list-leave-active {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .list-enter-from {
+    @apply opacity-0 -translate-x-8;
+  }
+
+  .list-leave-to {
+    @apply opacity-0 translate-x-8;
+  }
+
+  /* Focus visible pour l'accessibilité */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  /* ========================================
+   * MODAL OVERLAY
+   * ======================================== */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 transition-opacity;
+  }
+
+  .modal-panel {
+    @apply bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all;
+  }
+
+  /* ========================================
+   * ANIMATIONS DE LISTE
+   * ======================================== */
+  .list-move {
+    @apply transition-transform duration-300 ease-in-out;
+  }
+
+  /* ========================================
+   * ANIMATIONS SLIDE-FADE
+   * ======================================== */
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    @apply opacity-0 -translate-y-5;
+  }
+}
